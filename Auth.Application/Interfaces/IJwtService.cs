@@ -10,5 +10,6 @@ namespace Auth.Application.Interfaces
     public interface IJwtService
     {
         public string GenerateToken(User user);
+        public User? GetClaimsIfTokenExpired(string token);
     }
 }

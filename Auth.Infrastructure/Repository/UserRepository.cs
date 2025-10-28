@@ -19,9 +19,92 @@ namespace Auth.Infrastructure.Repository
             _context = context;
         }
 
-        public async Task<User?> GetByUsernameAsync(string username)
+        public IQueryable<User> GetAllQueryable()
         {
-            return await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+            return _context.Users.AsQueryable();
+        }
+
+        public async Task<List<User>?> FindAll ()
+        {
+            try
+            {
+                return await _context.Users.Include((u) => u.UserType).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<User?> FindById(int id)
+        {
+            try
+            {
+                return await _context.Users.Include((u) => u.UserType).FirstOrDefaultAsync(u => u.Id == id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<User?> FindOneByEmail(string email)
+        {
+            try
+            {
+                return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            }
+            catch (Exception ex)
+            {
+                var msg = ex.Message;
+                throw ;
+            }
+        }
+
+        public async Task<User?> Create(User user)
+        {
+            try
+            {
+                _context.Users.Add(user);
+                int rows = await _context.SaveChangesAsync();
+
+                return (user.Id > 0 && rows > 0) ? user : null;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<User?> Update (User user)
+        {
+            try
+            {
+                _context.Users.Update(user);
+                int rows = await _context.SaveChangesAsync();
+                return (rows > 0) ? user : null;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<User?> BlockUser(int id)
+        {
+            try
+            {
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+                if (user == null) return null;
+                user.IsActive = true;
+                _context.Users.Update(user);
+                int rows = await _context.SaveChangesAsync();
+                return (rows > 0) ? user : null;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
     }
 }
