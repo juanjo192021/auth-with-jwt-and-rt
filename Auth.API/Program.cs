@@ -1,6 +1,8 @@
 using Auth.API.Common.Filters;
 using Auth.Infrastructure.Extensions;
+using Auth.API.Validators;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
+using FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,8 +17,14 @@ builder.Services.AddControllers(options =>
 
 // Activas la validación automática
 builder.Services.AddFluentValidationAutoValidation();
+
+// Validadores
+builder.Services.AddValidatorsFromAssembly(typeof(SignupRequestValidator).Assembly);
+
 // Registrar tu infraestructura (DbContext, repos, validadores, etc.)
 builder.Services.AddInfrastructure(builder.Configuration);
+
+
 
 // Swagger
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

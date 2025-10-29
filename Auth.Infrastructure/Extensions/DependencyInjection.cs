@@ -1,12 +1,10 @@
 ﻿using Auth.Application.Interfaces;
 using Auth.Application.Mappings;
 using Auth.Application.UseCases.Auth;
-using Auth.Application.Validators;
 using Auth.Domain.Interfaces;
 using Auth.Infrastructure.Persistence;
 using Auth.Infrastructure.Repository;
 using Auth.Infrastructure.Services;
-using FluentValidation;
 using Mapster;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
@@ -35,9 +33,6 @@ namespace Auth.Infrastructure.Extensions
             var config = TypeAdapterConfig.GlobalSettings;
             services.AddSingleton(config);
             services.AddScoped<IMapper, ServiceMapper>();
-
-            // Validadores
-            services.AddValidatorsFromAssembly(typeof(SignupRequestValidator).Assembly);
 
             // Repositorios
             services.AddScoped<IUserRepository, UserRepository>();

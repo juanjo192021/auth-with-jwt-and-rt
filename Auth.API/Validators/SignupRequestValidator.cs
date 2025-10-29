@@ -1,9 +1,9 @@
-﻿using Auth.Application.DTOs.Auth;
+﻿using Auth.API.Contracts.Requests;
 using FluentValidation;
 
-namespace Auth.Application.Validators
+namespace Auth.API.Validators
 {
-    public class SignupRequestValidator : AbstractValidator<SignupDto>
+    public class SignupRequestValidator : AbstractValidator<SignupRequest>
     {
         public SignupRequestValidator()
         {
