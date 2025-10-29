@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using Auth.Infrastructure;
-using Microsoft.EntityFrameworkCore;
 using Auth.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Auth.Infrastructure.Persistence;
 
@@ -31,9 +30,11 @@ public partial class AuthWithJwtAndRefreshTokenDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+
         modelBuilder.Entity<RefreshTokenHistory>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__RefreshT__3214EC07C7BEF687");
+            entity.HasKey(e => e.Id).HasName("PK__RefreshT__3214EC0769711D20");
 
             entity.ToTable("RefreshTokenHistory");
 
@@ -41,7 +42,7 @@ public partial class AuthWithJwtAndRefreshTokenDbContext : DbContext
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
             entity.Property(e => e.ExpirationDate).HasColumnType("datetime");
-            entity.Property(e => e.IsActive).HasComputedColumnSql("(case when [ExpirationDate]<getdate() then CONVERT([bit],(0)) else CONVERT([bit],(1)) end)", false);
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.RefreshToken)
                 .HasMaxLength(200)
                 .IsUnicode(false);
@@ -52,7 +53,7 @@ public partial class AuthWithJwtAndRefreshTokenDbContext : DbContext
             entity.HasOne(d => d.User).WithMany(p => p.RefreshTokenHistories)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__RefreshTo__UserI__70DDC3D8");
+                .HasConstraintName("FK__RefreshTo__UserI__04E4BC85");
         });
 
         modelBuilder.Entity<Role>(entity =>
@@ -66,7 +67,7 @@ public partial class AuthWithJwtAndRefreshTokenDbContext : DbContext
             entity.Property(e => e.Description)
                 .HasMaxLength(200)
                 .IsUnicode(false);
-            entity.Property(e => e.IsActive).HasDefaultValue(true).ValueGeneratedOnAdd();
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.Name)
                 .HasMaxLength(50)
                 .IsUnicode(false);
@@ -103,8 +104,8 @@ public partial class AuthWithJwtAndRefreshTokenDbContext : DbContext
             entity.Property(e => e.ImageUrl)
                 .HasMaxLength(200)
                 .IsUnicode(false);
-            entity.Property(e => e.IsActive).HasDefaultValue(true).ValueGeneratedOnAdd();
-            entity.Property(e => e.IsConfirmed).HasDefaultValue(true).ValueGeneratedOnAdd();
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
+            entity.Property(e => e.IsConfirmed).HasDefaultValue(true);
             entity.Property(e => e.LastName)
                 .HasMaxLength(60)
                 .IsUnicode(false);
@@ -131,7 +132,7 @@ public partial class AuthWithJwtAndRefreshTokenDbContext : DbContext
 
             entity.ToTable("UserRole");
 
-            entity.Property(e => e.IsActive).HasDefaultValue(true).ValueGeneratedOnAdd();
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
 
             entity.HasOne(d => d.Role).WithMany(p => p.UserRoles)
                 .HasForeignKey(d => d.RoleId)
@@ -155,7 +156,7 @@ public partial class AuthWithJwtAndRefreshTokenDbContext : DbContext
             entity.Property(e => e.Description)
                 .HasMaxLength(500)
                 .IsUnicode(false);
-            entity.Property(e => e.IsActive).HasDefaultValue(true).ValueGeneratedOnAdd();
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.Name)
                 .HasMaxLength(50)
                 .IsUnicode(false);

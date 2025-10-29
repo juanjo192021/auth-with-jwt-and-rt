@@ -2,11 +2,6 @@
 using Auth.Domain.Interfaces;
 using Auth.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Auth.Infrastructure.Repository
 {
@@ -24,87 +19,48 @@ namespace Auth.Infrastructure.Repository
             return _context.Users.AsQueryable();
         }
 
-        public async Task<List<User>?> FindAll ()
+        public async Task<List<User>?> FindAllAsync()
         {
-            try
-            {
-                return await _context.Users.Include((u) => u.UserType).ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            return await _context.Users.Include((u) => u.UserType).ToListAsync();
         }
 
-        public async Task<User?> FindById(int id)
+        public async Task<User?> FindByIdAsync(int id)
         {
-            try
-            {
-                return await _context.Users.Include((u) => u.UserType).FirstOrDefaultAsync(u => u.Id == id);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            return await _context.Users.Include((u) => u.UserType).FirstOrDefaultAsync(u => u.Id == id);
         }
 
-        public async Task<User?> FindOneByEmail(string email)
+        public async Task<User?> FindByEmailAsync(string email)
         {
-            try
-            {
-                return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
-            }
-            catch (Exception ex)
-            {
-                var msg = ex.Message;
-                throw ;
-            }
+            return await _context.Users.Include(u => u.UserType)
+                .Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
+                .FirstOrDefaultAsync(u => u.Email == email);
         }
 
-        public async Task<User?> Create(User user)
+        public async Task<User?> CreateAsync(User user)
         {
-            try
-            {
-                _context.Users.Add(user);
-                int rows = await _context.SaveChangesAsync();
+            _context.Users.Add(user);
+            int rows = await _context.SaveChangesAsync();
 
-                return (user.Id > 0 && rows > 0) ? user : null;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            return (user.Id > 0 && rows > 0) ? user : null;
         }
 
-        public async Task<User?> Update (User user)
+        public async Task<User?> UpdateAsync (User user)
         {
-            try
-            {
-                _context.Users.Update(user);
-                int rows = await _context.SaveChangesAsync();
-                return (rows > 0) ? user : null;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            _context.Users.Update(user);
+            int rows = await _context.SaveChangesAsync();
+            return (rows > 0) ? user : null;
         }
 
-        public async Task<User?> BlockUser(int id)
+        public async Task<User?> BlockUserAsync(int id)
         {
-            try
-            {
-                var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
-                if (user == null) return null;
-                user.IsActive = true;
-                _context.Users.Update(user);
-                int rows = await _context.SaveChangesAsync();
-                return (rows > 0) ? user : null;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            //var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+            var user = await FindByIdAsync(id);
+            if (user == null) return null;
+            user.IsActive = false;
+            _context.Users.Update(user);
+            int rows = await _context.SaveChangesAsync();
+            return (rows > 0) ? user : null;
         }
     }
 }

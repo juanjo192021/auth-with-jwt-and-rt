@@ -1,17 +1,24 @@
+using Auth.API.Common.Filters;
 using Auth.Infrastructure.Extensions;
-using Microsoft.AspNetCore.Mvc;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ✅ 1. Agregas los controladores normalmente
+//Agregas los controladores normalmente
 builder.Services.AddControllers();
-// ✅ 2. Activas la validación automática
+
+// Agregas el filtro global de manejo de excepciones
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<HttpExceptionFilter>();
+});
+
+// Activas la validación automática
 builder.Services.AddFluentValidationAutoValidation();
-// ✅ 3. Registrar tu infraestructura (DbContext, repos, validadores, etc.)
+// Registrar tu infraestructura (DbContext, repos, validadores, etc.)
 builder.Services.AddInfrastructure(builder.Configuration);
 
-// ✅ Swagger
+// Swagger
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

@@ -1,26 +1,17 @@
-﻿using Auth.Application.Interfaces;
+﻿using Auth.Application.Common.Exceptions;
+using Auth.Application.Interfaces;
 using Auth.Domain.Entities;
+using Auth.Application.Enums;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Auth.Infrastructure.Services
 {
     public class JwtService : IJwtService
     {
-
-        //"Jwt": {
-        //  "Key": "clave-secreta-bien-larga",
-        //  "Issuer": "TuApp",
-        //  "Audience": "TuAppUsers"
-        //}
-
         private readonly IConfiguration _configuration;
 
         public JwtService(IConfiguration configuration)
@@ -28,7 +19,7 @@ namespace Auth.Infrastructure.Services
             _configuration = configuration;
         }
 
-        // Genera un token JWT para el usuario dado
+        // Genera un token JWT para el usuario
         public string GenerateToken(User user)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
@@ -36,7 +27,11 @@ namespace Auth.Infrastructure.Services
 
             var claims = new[]
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                //ClaimTypes.NameIdentifier
+                new Claim("id", user.Id.ToString()),
+                new Claim(JwtRegisteredClaimNames.Iat,
+                  DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(),
+                  ClaimValueTypes.Integer64),
                 //new Claim(ClaimTypes.Name, user.FirstName + ' '+ user.LastName )
             };
 
@@ -54,36 +49,76 @@ namespace Auth.Infrastructure.Services
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        // Extrae los claims del token si ha expirado, o devuelve null si aún es válido
-        public User? GetClaimsIfTokenExpired(string token)
+        // Verifica si el token JWT ha expirado
+        public TokenStatus ValidateToken(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!);
 
-            // Leer el token (sin validarlo aún)
-            var jwtToken = tokenHandler.ReadJwtToken(token);
-
-            // Validar si aún no ha expirado
-            if (jwtToken.ValidTo > DateTime.UtcNow)
+            try
             {
-                return null; // Token aún válido
+                tokenHandler.ValidateToken(token, new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = _configuration["Jwt:Issuer"],
+                    ValidAudience = _configuration["Jwt:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ClockSkew = TimeSpan.Zero
+                }, out SecurityToken validatedToken);
+
+                // Token válido
+                return TokenStatus.Valid;
             }
-
-            // Token expirado, extraemos claims manualmente
-            var idClaim = jwtToken.Claims.FirstOrDefault(c =>
-                c.Type == ClaimTypes.NameIdentifier || c.Type == JwtRegisteredClaimNames.NameId);
-
-            // 
-            //var usernameClaim = jwtToken.Claims.FirstOrDefault(c =>
-            //    c.Type == ClaimTypes.Name || c.Type == JwtRegisteredClaimNames.UniqueName);
-
-            if (idClaim == null /*|| usernameClaim == null*/)
-                return null;
-
-            return new User
+            catch (SecurityTokenExpiredException)
             {
-                Id = int.Parse(idClaim.Value),
-                /*Email = usernameClaim.Value*/
-            };
+                // Token expirado
+                return TokenStatus.Expired;
+            }
+            catch (SecurityTokenInvalidSignatureException)
+            {
+                return TokenStatus.InvalidSignature;
+            }
+            catch (ArgumentException)
+            {
+                return TokenStatus.InvalidFormat;
+            }
+            catch (Exception)
+            {
+                return TokenStatus.Corrupt;
+            }
         }
+
+        // Obtiene los claims del token JWT expirado
+        public ClaimsPrincipal? GetPrincipalFromExpiredToken(string token)
+        {
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateAudience = false,
+                ValidateIssuer = false,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!)),
+                ValidateLifetime = false
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            try
+            {
+                var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out var securityToken);
+
+                if (securityToken is not JwtSecurityToken jwtToken ||
+                    !jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+                    return null;
+
+                return principal;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
     }
 }

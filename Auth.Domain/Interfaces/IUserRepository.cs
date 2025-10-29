@@ -11,16 +11,16 @@ namespace Auth.Domain.Interfaces
     {
         public IQueryable<User> GetAllQueryable();
 
-        Task<List<User>?> FindAll();
+        Task<List<User>?> FindAllAsync();
 
-        Task<User?> FindById(int id);
+        Task<User?> FindByIdAsync(int id);
 
-        Task<User?> FindOneByEmail(string email);
+        Task<User?> FindByEmailAsync(string email);
 
-        Task<User?> Create(User user);
+        Task<User?> CreateAsync(User user);
 
-        Task<User?> Update(User user);
+        Task<User?> UpdateAsync(User user);
 
-        Task<User?> BlockUser(int id);
+        Task<User?> BlockUserAsync(int id);
     }
 }

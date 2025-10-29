@@ -55,9 +55,13 @@ namespace Auth.Application.Validators
             RuleFor(x => x.Address)
                 .NotEmpty().WithMessage("La dirección es obligatoria.");
 
-            //RuleFor(x => x.UserTypeId)
-            //    .NotEmpty().WithMessage("El tipo de usuario es obligatorio.")
-            //    .GreaterThan(0).WithMessage("El tipo de usuario debe ser mayor que 0.");
+            RuleFor(x => x.UserTypeId)
+                .NotEmpty().WithMessage("El tipo de usuario es obligatorio.")
+                .GreaterThan(0).WithMessage("El tipo de usuario debe ser mayor que 0.");
+
+            RuleFor(x => x.Roles)
+                .NotEmpty().WithMessage("Debe asignar al menos un rol al usuario.");
+                
 
         }
     }

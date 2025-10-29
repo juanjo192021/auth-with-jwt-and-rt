@@ -1,11 +1,4 @@
-﻿using Auth.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Auth.Application.DTOs.User
+﻿namespace Auth.Application.DTOs.User
 {
     public class CreateUserDto
     {

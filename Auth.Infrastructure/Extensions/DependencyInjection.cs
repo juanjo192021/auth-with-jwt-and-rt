@@ -52,6 +52,7 @@ namespace Auth.Infrastructure.Extensions
             // (Opcional) Registra usecases si quieres centralizar aquí
             services.AddScoped<LoginUseCase>();
             services.AddScoped<SignupUseCase>();
+            services.AddScoped<RefreshTokenUseCase>();
 
             return services;
         }

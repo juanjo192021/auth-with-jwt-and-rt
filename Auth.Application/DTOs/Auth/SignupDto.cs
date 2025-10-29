@@ -1,6 +1,4 @@
-﻿using System.Collections;
-
-namespace Auth.Application.DTOs.Auth
+﻿namespace Auth.Application.DTOs.Auth
 {
     public class SignupDto
     {
