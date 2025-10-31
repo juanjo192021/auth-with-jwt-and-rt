@@ -31,7 +31,8 @@ builder.Services.AddControllers(options =>
 builder.Services.AddFluentValidationAutoValidation();
 
 // Validadores
-builder.Services.AddValidatorsFromAssembly(typeof(SignupRequestValidator).Assembly);
+//builder.Services.AddValidatorsFromAssembly(typeof(SignupRequestValidator).Assembly);
+builder.Services.AddValidatorsFromAssemblyContaining<SignupRequestValidator>();
 
 // Registrar tu infraestructura (DbContext, repos, validadores, etc.)
 builder.Services.AddInfrastructure(builder.Configuration);

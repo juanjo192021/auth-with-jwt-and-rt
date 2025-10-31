@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Auth.API.Common.Constants;
+using Auth.API.Common.Responses;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.Text;
@@ -40,20 +42,34 @@ namespace Auth.API.Common.Extensions
                     {
                         context.Response.StatusCode = StatusCodes.Status403Forbidden;
                         context.Response.ContentType = "application/json";
-                        await context.Response.WriteAsync(JsonSerializer.Serialize(new
+
+                        var error = new ErrorResponse
                         {
-                            message = "No tienes permisos suficientes para acceder a este recurso."
-                        }));
+                            Type = ErrorTypeUris.Forbidden,
+                            Title = "Acceso denegado",
+                            Status = StatusCodes.Status403Forbidden,
+                            Errors = "No tienes permisos suficientes para acceder a este recurso.",
+                            TraceId = context.HttpContext.TraceIdentifier,
+                        };
+
+                        await context.Response.WriteAsync(JsonSerializer.Serialize(error));
                     },
                     OnChallenge = async context =>
                     {
                         context.HandleResponse(); // evita la respuesta por defecto
                         context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                         context.Response.ContentType = "application/json";
-                        await context.Response.WriteAsync(JsonSerializer.Serialize(new
+
+                        var error = new ErrorResponse
                         {
-                            message = "Token inválido o faltante."
-                        }));
+                            Type = ErrorTypeUris.Unauthorized,
+                            Title = "No autorizado",
+                            Status = StatusCodes.Status401Unauthorized,
+                            Errors = "Token inválido, expirado o faltante. Incluye un token JWT válido en el encabezado Authorization: Bearer <token>.",
+                            TraceId = context.HttpContext.TraceIdentifier,
+                        };
+
+                        await context.Response.WriteAsync(JsonSerializer.Serialize(error));
                     }
                 };
             });

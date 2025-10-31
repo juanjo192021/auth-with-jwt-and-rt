@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using Auth.API.Common.Constants;
+using Auth.API.Common.Responses;
+using System.Net;
 using System.Text.Json;
 
 namespace Auth.API.Common.Middlewares
@@ -22,28 +24,45 @@ namespace Auth.API.Common.Middlewares
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unhandled exception occurred");
-
-                context.Response.ContentType = "application/json";
-
-                var statusCode = ex switch
-                {
-                    UnauthorizedAccessException => HttpStatusCode.Unauthorized,
-                    ArgumentException => HttpStatusCode.BadRequest,
-                    _ => HttpStatusCode.InternalServerError
-                };
-
-                context.Response.StatusCode = (int)statusCode;
-
-                var response = new
-                {
-                    statusCode = context.Response.StatusCode,
-                    message = ex.Message,
-                    error = statusCode.ToString()
-                };
-
-                await context.Response.WriteAsync(JsonSerializer.Serialize(response));
+                await HandleExceptionAsync(context, ex);
             }
+        }
+
+        private async Task HandleExceptionAsync(HttpContext context, Exception exception)
+        {
+            _logger.LogError(exception, "❌ Unhandled exception occurred");
+
+            var statusCode = exception switch
+            {
+                UnauthorizedAccessException => HttpStatusCode.Unauthorized,
+                ArgumentException => HttpStatusCode.BadRequest,
+                _ => HttpStatusCode.InternalServerError
+            };
+
+            var errorResponse = new ErrorResponse
+            {
+                Type = ErrorTypeUris.InternalServerError,
+                Title = statusCode switch
+                {
+                    HttpStatusCode.BadRequest => "Bad Request",
+                    HttpStatusCode.Unauthorized => "Unauthorized",
+                    _ => "Internal Server Error"
+                },
+                Status = (int)statusCode,
+                Errors = exception.Message,
+                TraceId = context.TraceIdentifier
+            };
+
+            var options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = true
+            };
+
+            context.Response.ContentType = "application/json";
+            context.Response.StatusCode = errorResponse.Status;
+
+            await context.Response.WriteAsync(JsonSerializer.Serialize(errorResponse, options));
         }
     }
 }

@@ -50,6 +50,7 @@ namespace Auth.Infrastructure.Extensions
             services.AddScoped<SignupUseCase>();
             services.AddScoped<RefreshTokenUseCase>();
             services.AddScoped<FindAllUseCase>();
+            services.AddScoped<FindByIdUseCase>();
 
             return services;
         }

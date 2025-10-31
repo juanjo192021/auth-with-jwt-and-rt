@@ -1,4 +1,4 @@
-﻿using Auth.API.Common.Dtos;
+﻿using Auth.API.Common.Requests;
 using FluentValidation;
 
 namespace Auth.API.Validators

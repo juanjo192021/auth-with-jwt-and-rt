@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace Auth.API.Common.Dtos
+﻿namespace Auth.API.Common.Requests
 {
     public class PaginationRequest
     {

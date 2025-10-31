@@ -1,49 +1,81 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
+﻿using Auth.API.Common.Constants;
+using Auth.API.Common.Responses;
 using Auth.Application.Common.Exceptions;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using System.Net;
 
 namespace Auth.API.Common.Filters
 {
     public class HttpExceptionFilter : IExceptionFilter
     {
+        private readonly ILogger<HttpExceptionFilter> _logger;
+
+        public HttpExceptionFilter(ILogger<HttpExceptionFilter> logger)
+        {
+            _logger = logger;
+        }
+
         public void OnException(ExceptionContext context)
         {
-            switch (context.Exception)
+            var exception = context.Exception;
+            var errorResponse = new ErrorResponse
+            {
+                TraceId = context.HttpContext.TraceIdentifier
+            };
+
+            switch (exception)
             {
                 case BadRequestException ex:
-                    context.Result = new BadRequestObjectResult(new { message = ex.Message });
+                    errorResponse.Type = ErrorTypeUris.BadRequest;
+                    errorResponse.Title = "Bad Request";
+                    errorResponse.Status = (int)HttpStatusCode.BadRequest;
+                    errorResponse.Errors = ex.Message;
                     break;
                 case UnauthorizedException ex:
-                    context.Result = new UnauthorizedObjectResult(new { message = ex.Message });
-                    break;
-                case NotFoundException ex:
-                    context.Result = new NotFoundObjectResult(new { message = ex.Message });
+                    errorResponse.Type = ErrorTypeUris.Unauthorized;
+                    errorResponse.Title = "Unauthorized";
+                    errorResponse.Status = (int)HttpStatusCode.Unauthorized;
+                    errorResponse.Errors = ex.Message;
                     break;
                 case ForbiddenException ex:
-                    context.Result = new ObjectResult(new { message = ex.Message })
-                    {
-                        StatusCode = 403
-                    };
+                    errorResponse.Type = ErrorTypeUris.Forbidden;
+                    errorResponse.Title = "Not Found";
+                    errorResponse.Status = (int)HttpStatusCode.NotFound;
+                    errorResponse.Errors = ex.Message;
+                    break;
+                case NotFoundException ex:
+                    errorResponse.Type = ErrorTypeUris.NotFound;
+                    errorResponse.Title = "Not Found";
+                    errorResponse.Status = (int)HttpStatusCode.NotFound;
+                    errorResponse.Errors = ex.Message;
                     break;
                 case ConflictException ex:
-                    context.Result = new ObjectResult(new { message = ex.Message })
-                    {
-                        StatusCode = 409
-                    };
+                    errorResponse.Type = ErrorTypeUris.Conflict;
+                    errorResponse.Title = "Conflict";
+                    errorResponse.Status = (int)HttpStatusCode.Conflict;
+                    errorResponse.Errors = ex.Message;
                     break;
                 case InternalServerErrorException ex:
-                    context.Result = new ObjectResult(new { message = ex.Message })
-                    {
-                        StatusCode = 500
-                    };
+                    errorResponse.Type = ErrorTypeUris.InternalServerError;
+                    errorResponse.Title = "Internal Server Error";
+                    errorResponse.Status = (int)HttpStatusCode.InternalServerError;
+                    errorResponse.Errors = ex.Message;
                     break;
                 default:
-                    context.Result = new ObjectResult(new { message = "Ocurrió un error interno por default" })
-                    {
-                        StatusCode = 500
-                    };
+                    errorResponse.Type = exception.GetType().Name;
+                    errorResponse.Title = "Unhandled Exception";
+                    errorResponse.Status = (int)HttpStatusCode.InternalServerError;
+                    errorResponse.Errors = "Ocurrió un error inesperado. Contacte al administrador.";
                     break;
             }
+
+            _logger.LogError(exception, "❌ [{Type}] {Message}", errorResponse.Type, errorResponse.Errors);
+
+            context.Result = new ObjectResult(errorResponse)
+            {
+                StatusCode = errorResponse.Status
+            };
 
             context.ExceptionHandled = true;
         }
