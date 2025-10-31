@@ -1,13 +1,22 @@
+using Auth.API.Common.Extensions;
 using Auth.API.Common.Filters;
-using Auth.Infrastructure.Extensions;
 using Auth.API.Validators;
-using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
+using Auth.Infrastructure.Extensions;
 using FluentValidation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
+using System.Security.Claims;
+using System.Text;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
 //Agregas los controladores normalmente
 builder.Services.AddControllers();
+
+// Authentication
+builder.Services.AddJwtAuthentication(builder.Configuration);
 
 // Agregas el filtro global de manejo de excepciones
 builder.Services.AddControllers(options =>
@@ -23,8 +32,6 @@ builder.Services.AddValidatorsFromAssembly(typeof(SignupRequestValidator).Assemb
 
 // Registrar tu infraestructura (DbContext, repos, validadores, etc.)
 builder.Services.AddInfrastructure(builder.Configuration);
-
-
 
 // Swagger
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -45,6 +52,7 @@ app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

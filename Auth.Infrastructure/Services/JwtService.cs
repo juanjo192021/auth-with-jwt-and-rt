@@ -1,9 +1,10 @@
 ﻿using Auth.Application.Common.Exceptions;
+using Auth.Application.Enums;
 using Auth.Application.Interfaces;
 using Auth.Domain.Entities;
-using Auth.Application.Enums;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -20,20 +21,40 @@ namespace Auth.Infrastructure.Services
         }
 
         // Genera un token JWT para el usuario
-        public string GenerateToken(User user)
+        public string GenerateToken(User user/*,IEnumerable<string> roles*/)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            var claims = new[]
+            //var claims = new[]
+            //{
+            //    //ClaimTypes.NameIdentifier
+            //    new Claim("id", user.Id.ToString()),
+            //    new Claim(JwtRegisteredClaimNames.Iat,
+            //      DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(),
+            //      ClaimValueTypes.Integer64),
+            //    //new Claim(ClaimTypes.Name, user.FirstName + ' '+ user.LastName )
+            //};
+
+            var claims = new List<Claim>
             {
-                //ClaimTypes.NameIdentifier
-                new Claim("id", user.Id.ToString()),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Iat,
-                  DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(),
-                  ClaimValueTypes.Integer64),
-                //new Claim(ClaimTypes.Name, user.FirstName + ' '+ user.LastName )
+                DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(),
+                ClaimValueTypes.Integer64),
             };
+
+            if (user.UserRoles != null && user.UserRoles.Any())
+            {
+                foreach (var userRole in user.UserRoles)
+                {
+                    if (userRole.Role != null && userRole.Role.IsActive)
+                    {
+                        //ClaimTypes.Role
+                        claims.Add(new Claim(ClaimTypes.Role, userRole.Role.Name));
+                    }
+                }
+            }
 
             var tokenExpiryMinutes = int.Parse(_configuration["Jwt:TokenExpiryMinutes"] ?? "60");
 

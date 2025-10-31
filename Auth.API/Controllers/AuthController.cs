@@ -50,7 +50,7 @@ namespace Auth.API.Controllers
         }
 
         [HttpPost]
-        [Route("refreshToken")]
+        [Route("refresh-token")]
         public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequest refreshTokenRequest)
         {
             var refreshTokenDto = _mapper.Map<RefreshTokenDto>(refreshTokenRequest);

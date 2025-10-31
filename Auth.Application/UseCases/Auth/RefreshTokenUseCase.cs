@@ -1,9 +1,10 @@
-﻿using Auth.Application.DTOs.Auth;
+﻿using Auth.Application.Common.Exceptions;
+using Auth.Application.DTOs.Auth;
 using Auth.Application.Enums;
 using Auth.Application.Interfaces;
 using Auth.Domain.Interfaces;
 using MapsterMapper;
-using Auth.Application.Common.Exceptions;
+using System.Security.Claims;
 
 namespace Auth.Application.UseCases.Auth
 {
@@ -76,13 +77,15 @@ namespace Auth.Application.UseCases.Auth
                 throw new BadRequestException("Token inválido o corrupto, no se pudo obtener información");
 
             // Obtener el claim del ID de usuario
-            var userIdClaim = principal.Claims.FirstOrDefault(c => c.Type == "id");
+            //var userIdClaim = principal.Claims.FirstOrDefault(c => c.Type == "id");
+            //var userIdClaim = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            var userIdClaim = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             // Verificar que el usuario exista
             if (userIdClaim == null)
                 throw new BadRequestException("No se encontró atributos en el token.");
 
-            var userId = int.Parse(userIdClaim.Value);
+            var userId = int.Parse(userIdClaim);
 
             var user = await _userRepository.FindByIdAsync(userId);
             if (user == null)

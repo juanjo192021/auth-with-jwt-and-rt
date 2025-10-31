@@ -19,6 +19,12 @@ namespace Auth.API.Common.Filters
                 case NotFoundException ex:
                     context.Result = new NotFoundObjectResult(new { message = ex.Message });
                     break;
+                case ForbiddenException ex:
+                    context.Result = new ObjectResult(new { message = ex.Message })
+                    {
+                        StatusCode = 403
+                    };
+                    break;
                 case ConflictException ex:
                     context.Result = new ObjectResult(new { message = ex.Message })
                     {
