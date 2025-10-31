@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Auth.API.Controllers
 {
-    [Route("api/v1/user-types")]
+    [Route("user-types")]
     [ApiController]
     [Authorize]
     public class UserTypeController : Controller

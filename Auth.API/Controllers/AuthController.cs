@@ -7,7 +7,7 @@ using MapsterMapper;
 
 namespace Auth.API.Controllers
 {
-    [Route("api/v1/auth")]
+    [Route("auth")]
     [ApiController]
     public class AuthController : Controller
     {

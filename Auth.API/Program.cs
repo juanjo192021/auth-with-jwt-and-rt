@@ -1,19 +1,22 @@
+using Auth.API.Common.Conventions;
 using Auth.API.Common.Extensions;
 using Auth.API.Common.Filters;
 using Auth.API.Validators;
 using Auth.Infrastructure.Extensions;
 using FluentValidation;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
-using System.Security.Claims;
-using System.Text;
-using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
 //Agregas los controladores normalmente
 builder.Services.AddControllers();
+
+// Agregas la convención de prefijo global de ruta
+
+builder.Services.AddControllers(options =>
+{
+    options.Conventions.Insert(0, new GlobalRoutePrefixConvention("api/v1"));
+});
 
 // Authentication
 builder.Services.AddJwtAuthentication(builder.Configuration);
