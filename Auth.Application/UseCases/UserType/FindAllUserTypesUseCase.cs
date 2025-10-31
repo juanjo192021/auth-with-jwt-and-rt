@@ -6,12 +6,12 @@ using MapsterMapper;
 
 namespace Auth.Application.UseCases.UserTypeCases
 {
-    public class FindAllUseCase
+    public class FindAllUserTypesUseCase
     {
         private readonly IUserTypeRepository _userTypeRepository;
         private readonly IMapper _mapper;
 
-        public FindAllUseCase(
+        public FindAllUserTypesUseCase(
             IUserTypeRepository userTypeRepository,
             IMapper mapper
             )
@@ -28,7 +28,7 @@ namespace Auth.Application.UseCases.UserTypeCases
 
             var (userTypes, totalRecords) = await _userTypeRepository.FindAllAsync(pageSize, page, search);
 
-            if ( userTypes == null)
+            if (userTypes == null)
             {
                 return null;
             }
@@ -41,7 +41,7 @@ namespace Auth.Application.UseCases.UserTypeCases
                 PageSize = pageSize,
                 TotalRecords = totalRecords,
                 TotalPages = totalPages,
-                HasPreviousPage = page> 1,
+                HasPreviousPage = page > 1,
                 HasNextPage = page < totalPages,
                 Data = _mapper.Map<List<UserTypeDto>>(userTypes)
             };

@@ -22,10 +22,6 @@ namespace Auth.Infrastructure.Extensions
             services.AddDbContext<AuthWithJwtAndRefreshTokenDbContext>(options =>
                 options.UseSqlServer(configuration.GetConnectionString("cadenaSQL")));
 
-            // AutoMapper
-            
-            //services.AddAutoMapper(typeof(UserProfile).Assembly);
-
             // Mapster
             // Registrar configuraciones personalizadas
             MapsterConfiguration.RegisterMappings();
@@ -49,8 +45,8 @@ namespace Auth.Infrastructure.Extensions
             services.AddScoped<LoginUseCase>();
             services.AddScoped<SignupUseCase>();
             services.AddScoped<RefreshTokenUseCase>();
-            services.AddScoped<FindAllUseCase>();
-            services.AddScoped<FindByIdUseCase>();
+            services.AddScoped<FindAllUserTypesUseCase>();
+            services.AddScoped<FindUserTypeByIdUseCase>();
 
             return services;
         }

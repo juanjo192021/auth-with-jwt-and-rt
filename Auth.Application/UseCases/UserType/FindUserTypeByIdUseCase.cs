@@ -6,12 +6,12 @@ using MapsterMapper;
 
 namespace Auth.Application.UseCases.UserTypeCases
 {
-    public class FindByIdUseCase
+    public class FindUserTypeByIdUseCase
     {
         private readonly IUserTypeRepository _userTypeRepository;
         private readonly IMapper _mapper;
 
-        public FindByIdUseCase(
+        public FindUserTypeByIdUseCase(
             IUserTypeRepository userTypeRepository,
             IMapper mapper
             )
@@ -25,7 +25,7 @@ namespace Auth.Application.UseCases.UserTypeCases
             var userType = await _userTypeRepository.FindByIdAsync(id);
             if (userType == null)
             {
-                throw new NotFoundException($"No se encontro un usuario con el ID {id}");
+                throw new NotFoundException($"No se encontró un usuario con el ID {id}");
             }
             return new DataDto<UserTypeDto>
             {

@@ -15,11 +15,11 @@ namespace Auth.API.Controllers
     [Authorize]
     public class UserTypeController : Controller
     {
-        private readonly FindAllUseCase _findAllUseCase;
-        private readonly FindByIdUseCase _findByIdUseCase;
+        private readonly FindAllUserTypesUseCase _findAllUseCase;
+        private readonly FindUserTypeByIdUseCase _findByIdUseCase;
         private readonly IMapper _mapper;
 
-        public UserTypeController(FindAllUseCase findAllUseCase, FindByIdUseCase findByIdUseCase, IMapper mapper)
+        public UserTypeController(FindAllUserTypesUseCase findAllUseCase, FindUserTypeByIdUseCase findByIdUseCase, IMapper mapper)
         {
             _findAllUseCase = findAllUseCase;
             _findByIdUseCase = findByIdUseCase;
@@ -32,7 +32,7 @@ namespace Auth.API.Controllers
         {
             var paginationDto = _mapper.Map<PaginationDto>(paginationRequest);
             var userTypes = await _findAllUseCase.FindAll(paginationDto);
-            var response = _mapper.Map<PaginationResponse<List<UserTypeDto>>>(userTypes);
+            var response = _mapper.Map<PaginationResponse<List<UserTypeDto>>>(userTypes!);
             return Ok(response);
         }
 
@@ -42,7 +42,7 @@ namespace Auth.API.Controllers
         public async Task<IActionResult> FindOne(int id)
         { 
             var userType = await _findByIdUseCase.FindById(id);
-            var response = _mapper.Map<DataResponse<UserTypeDto>>(userType);
+            var response = _mapper.Map<DataResponse<UserTypeDto>>(userType!);
             return Ok(response);
         }
     }
