@@ -1,6 +1,7 @@
 using Auth.API.Common.Conventions;
 using Auth.API.Common.Extensions;
 using Auth.API.Common.Filters;
+using Auth.API.Common.Middlewares;
 using Auth.API.Validators;
 using Auth.Infrastructure.Extensions;
 using FluentValidation;
@@ -12,13 +13,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 // Agregas la convención de prefijo global de ruta
-
 builder.Services.AddControllers(options =>
 {
     options.Conventions.Insert(0, new GlobalRoutePrefixConvention("api/v1"));
 });
 
-// Authentication
+// Autenticación JWT
 builder.Services.AddJwtAuthentication(builder.Configuration);
 
 // Agregas el filtro global de manejo de excepciones
@@ -49,15 +49,26 @@ var app = builder.Build();
 //    app.UseSwagger();
 //    app.UseSwaggerUI();
 //}
-
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.UseHttpsRedirection();
+// Primero capturamos excepciones globales
+app.UseMiddleware<ExceptionMiddleware>();
 
+// Middleware personalizado para 404
+app.UseMiddleware<NotFoundMiddleware>();
+
+// Enrutamiento
+app.UseRouting();
+
+// Autenticación y autorización
 app.UseAuthentication();
 app.UseAuthorization();
 
+// HTTPS Redirection
+app.UseHttpsRedirection();
+
+// Mapear controladores
 app.MapControllers();
 
 app.Run();
