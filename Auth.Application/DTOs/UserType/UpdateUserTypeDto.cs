@@ -6,11 +6,8 @@ using System.Threading.Tasks;
 
 namespace Auth.Application.DTOs.UserType
 {
-    public class UpdateUserTypeDto
+    public class UpdateUserTypeDto: CreateUserTypeDto
     {
-        public int Id { get; set; }
-        public string Name { get; set; } = null!;
-        public string? Description { get; set; }
-        public bool Status { get; set; }
+        public int Id { get; set; } = 0!;
     }
 }

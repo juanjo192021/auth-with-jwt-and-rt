@@ -1,6 +1,7 @@
 ﻿using Auth.Application.Interfaces;
 using Auth.Application.Mappings;
 using Auth.Application.UseCases.Auth;
+using Auth.Application.UseCases.UserTypeCase;
 using Auth.Application.UseCases.UserTypeCases;
 using Auth.Domain.Interfaces;
 using Auth.Infrastructure.Persistence;
@@ -47,6 +48,9 @@ namespace Auth.Infrastructure.Extensions
             services.AddScoped<RefreshTokenUseCase>();
             services.AddScoped<FindAllUserTypesUseCase>();
             services.AddScoped<FindUserTypeByIdUseCase>();
+            services.AddScoped<CreateUserTypeUseCase>();
+            services.AddScoped<UpdateUserTypeUseCase>();
+            services.AddScoped<DeactivateUserTypeUseCase>();
 
             return services;
         }

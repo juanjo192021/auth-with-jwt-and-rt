@@ -8,7 +8,14 @@ namespace Auth.Application.Mappings
     {
         public void Register(TypeAdapterConfig config)
         {
+            // De un UserType a un UserTypeDTO
             config.NewConfig<UserType, UserTypeDto>();
+
+            // De un CreateUserTypeDTO a un UserType
+            config.NewConfig<CreateUserTypeDto, UserType>();
+
+
+            config.NewConfig<UpdateUserTypeDto, UserType>().IgnoreNullValues(true);
         }
     }
 }

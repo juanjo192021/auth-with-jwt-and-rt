@@ -20,7 +20,7 @@ namespace Auth.Application.UseCases.UserTypeCases
             _mapper = mapper;
         }
 
-        public async Task<PaginationResultDto<List<UserTypeDto>>?> FindAll(PaginationDto paginationDto)
+        public async Task<PaginationResultDto<List<UserTypeDto>>?> FindAllAsync(PaginationDto paginationDto)
         {
             var page = paginationDto.Page;
             var pageSize = paginationDto.PageSize;
