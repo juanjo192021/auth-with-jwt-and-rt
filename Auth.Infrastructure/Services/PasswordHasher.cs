@@ -12,7 +12,7 @@ namespace Auth.Infrastructure.Services
     {
         public string Hash(string password)
         {
-            return BCrypt.Net.BCrypt.HashPassword(password, BCrypt.Net.BCrypt.GenerateSalt(12));
+            return BCrypt.Net.BCrypt.HashPassword(password, BCrypt.Net.BCrypt.GenerateSalt(10));
         }
 
         public bool Verify(string password, string passwordHash)

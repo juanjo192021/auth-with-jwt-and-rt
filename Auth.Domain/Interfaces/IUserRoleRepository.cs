@@ -8,6 +8,6 @@ namespace Auth.Domain.Interfaces
 {
     public interface IUserRoleRepository
     {
-        public Task<bool> CreateAsync(int userId, List<int> roleIds);
+        public Task<int> CreateAsync(int userId, List<int> roleIds);
     }
 }

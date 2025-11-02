@@ -26,6 +26,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Script", "Script", "{02EA68
 		Script.sql = Script.sql
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{E8592356-3756-47FE-A1C7-A1BF759521B1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.UnitTests", "Auth.UnitTests\Auth.UnitTests.csproj", "{E1930472-4C53-4917-BD40-413741AC0A1F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{4E54CE27-06D3-49A9-8963-CA777A78340C} = {4E54CE27-06D3-49A9-8963-CA777A78340C}
+		{6A32333A-DC8E-4BD7-B850-4D9DDE6A3D1E} = {6A32333A-DC8E-4BD7-B850-4D9DDE6A3D1E}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,9 +56,16 @@ Global
 		{4E54CE27-06D3-49A9-8963-CA777A78340C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4E54CE27-06D3-49A9-8963-CA777A78340C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4E54CE27-06D3-49A9-8963-CA777A78340C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E1930472-4C53-4917-BD40-413741AC0A1F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E1930472-4C53-4917-BD40-413741AC0A1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E1930472-4C53-4917-BD40-413741AC0A1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E1930472-4C53-4917-BD40-413741AC0A1F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{E1930472-4C53-4917-BD40-413741AC0A1F} = {E8592356-3756-47FE-A1C7-A1BF759521B1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E69227FA-3EE2-444B-9978-7987F078D418}

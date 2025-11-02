@@ -1,4 +1,5 @@
-﻿using Auth.Application.DTOs.Auth;
+﻿using Auth.Application.Common.Exceptions;
+using Auth.Application.DTOs.Auth;
 using Auth.Application.DTOs.User;
 using Auth.Application.Interfaces;
 using Auth.Domain.Entities;
@@ -35,42 +36,36 @@ namespace Auth.Application.UseCases.Auth
 
         public async Task<AuthResultDto> Signup(SignupDto signupRequest)
         {
-            // Encriptar la contraseña
+         
             var hashedPassword = _passwordHasher.Hash(signupRequest.Password);
-
-            // Transformar SignupRequest a User
             var userEntity = _mapper.Map<User>(signupRequest);
-
-            // Asignar la contraseña encriptada
             userEntity.Password = hashedPassword;
+            userEntity.IsActive = true;
+            userEntity.IsConfirmed = true;
 
-            // Guardar el usuario en la base de datos
-            var user = await _userRepository.Create(userEntity);
+            var user = await _userRepository.CreateAsync(userEntity);
 
-            // Validar que el usuario se haya creado correctamente
             if (user == null)
-                throw new InvalidOperationException("Error al crear el usuario");
+                throw new InternalServerErrorException("Error al guardar usuario en la BD");
 
-            // Asignar roles al usuario
-            var response = await _userRoleRepository.CreateAsync(user.Id, signupRequest.Roles);
+            var added = await _userRoleRepository.CreateAsync(user.Id, signupRequest.Roles);
 
-            if (!response)
-                throw new InvalidOperationException("Error al asignar roles al usuario");
+            if (added == 0)
+                throw new BadRequestException("No se encontraron roles válidos para asignar.");
 
-            // Generar el token JWT
             var token = _jwtService.GenerateToken(user);
 
-            // Generar el refresh token
             var refreshToken = _refreshTokenService.GenerateRefreshToken();
 
-            // Guardar el refresh token en la base de datos
-            await _refreshTokenService.SaveRefreshToken(user.Id, token, refreshToken);
+            await _refreshTokenService.CreateAsync(user.Id, token, refreshToken);
+
+            user = await _userRepository.FindByIdAsync(user.Id);
 
             return new AuthResultDto
             {
                 Token = token,
                 RefreshToken = refreshToken,
-                User = _mapper.Map<UserDto>(user)
+                User = _mapper.Map<UserDto>(user!)
             };
         }
     }

@@ -10,6 +10,7 @@
 *.user
 *.userosscache
 *.sln.docstates
+.sonarqube
 .vs
 
 # User-specific files (MonoDevelop/Xamarin Studio)

@@ -1,12 +1,4 @@
-﻿using Auth.Application.DTOs.UserType;
-using Auth.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Auth.Application.DTOs.User
+﻿namespace Auth.Application.DTOs.User
 {
     public class UserDto
     {
@@ -42,7 +34,9 @@ namespace Auth.Application.DTOs.User
 
         public DateTime RegistrationDate { get; set; }
 
-        public UserTypeDto UserType { get; set; } = null!;
+        public string UserType { get; set; } = null!;
+
+        public List<string> Roles { get; set; } = new List<string>();
 
     }
 }

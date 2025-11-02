@@ -81,7 +81,7 @@ CREATE TABLE RefreshTokenHistory (
     RefreshToken VARCHAR(200) NOT NULL,
     CreationDate DATETIME NOT NULL DEFAULT GETDATE(),
     ExpirationDate DATETIME NOT NULL,
-    IsActive AS (IIF(ExpirationDate < GETDATE(), CONVERT(BIT,0), CONVERT(BIT,1))),
+    IsActive BIT NOT NULL DEFAULT 1,
     FOREIGN KEY (UserId) REFERENCES [User](Id)
 );
 

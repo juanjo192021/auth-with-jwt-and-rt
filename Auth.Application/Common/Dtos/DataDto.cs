@@ -7,13 +7,8 @@ using System.Threading.Tasks;
 
 namespace Auth.Application.Common.Responses
 {
-    public class DataResponse<T>
+    public class DataDto<T>
     {
-        public int StatusCode { get; set; }
-        public string Message { get; set; } = null!;
-        public bool Success { get; set; }
-
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public T? Data { get; set; } = default!;
     }
 }

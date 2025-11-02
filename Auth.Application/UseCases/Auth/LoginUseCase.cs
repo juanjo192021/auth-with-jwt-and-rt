@@ -1,4 +1,5 @@
-﻿using Auth.Application.DTOs.Auth;
+﻿using Auth.Application.Common.Exceptions;
+using Auth.Application.DTOs.Auth;
 using Auth.Application.DTOs.User;
 using Auth.Application.Interfaces;
 using Auth.Domain.Interfaces;
@@ -34,23 +35,24 @@ namespace Auth.Application.UseCases.Auth
             var email = loginRequest.Email;
             var password = loginRequest.Password;
 
-            var user = await _userRepository.FindOneByEmail(email);
+            var user = await _userRepository.FindByEmailAsync(email);
             if (user == null)
-                throw new Exception("Usuario no encontrado");
+                throw new NotFoundException($"No se encontró un usuario con el email {email}");
 
-            user.Password = _passwordHasher.Hash(password); // Asegura que la contraseña esté hasheada
+            user.Password = _passwordHasher.Hash(password);
 
             bool validPassword = _passwordHasher.Verify(password, user.Password);
             if (!validPassword)
-                throw new Exception("Email / Password inválida");
+                throw new BadRequestException("Email / Password inválidos");
 
+            // Generar el token JWT
             var token = _jwtService.GenerateToken(user);
 
             // Generar el refresh token
             var refreshToken = _refreshTokenService.GenerateRefreshToken();
 
             // Guardar el refresh token en la base de datos
-            await _refreshTokenService.SaveRefreshToken(user.Id, token, refreshToken);
+            await _refreshTokenService.CreateAsync(user.Id, token, refreshToken);
 
             return new AuthResultDto
             {

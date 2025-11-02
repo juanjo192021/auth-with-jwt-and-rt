@@ -1,12 +1,12 @@
 ﻿using Auth.Application.Interfaces;
 using Auth.Application.Mappings;
 using Auth.Application.UseCases.Auth;
-using Auth.Application.Validators;
+using Auth.Application.UseCases.UserTypeCase;
+using Auth.Application.UseCases.UserTypeCases;
 using Auth.Domain.Interfaces;
 using Auth.Infrastructure.Persistence;
 using Auth.Infrastructure.Repository;
 using Auth.Infrastructure.Services;
-using FluentValidation;
 using Mapster;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
@@ -23,10 +23,6 @@ namespace Auth.Infrastructure.Extensions
             services.AddDbContext<AuthWithJwtAndRefreshTokenDbContext>(options =>
                 options.UseSqlServer(configuration.GetConnectionString("cadenaSQL")));
 
-            // AutoMapper
-            
-            //services.AddAutoMapper(typeof(UserProfile).Assembly);
-
             // Mapster
             // Registrar configuraciones personalizadas
             MapsterConfiguration.RegisterMappings();
@@ -36,13 +32,10 @@ namespace Auth.Infrastructure.Extensions
             services.AddSingleton(config);
             services.AddScoped<IMapper, ServiceMapper>();
 
-            // Validadores
-            services.AddValidatorsFromAssembly(typeof(SignupRequestValidator).Assembly);
-
             // Repositorios
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserRoleRepository, UserRoleRepository>();
-            //services.AddScoped<IAuthRepository, AuthRepository>(); // si lo tienes
+            services.AddScoped<IUserTypeRepository, UserTypeRepository>();
 
             // Servicios concretos
             services.AddScoped<IPasswordHasher, PasswordHasher>();
@@ -52,6 +45,12 @@ namespace Auth.Infrastructure.Extensions
             // (Opcional) Registra usecases si quieres centralizar aquí
             services.AddScoped<LoginUseCase>();
             services.AddScoped<SignupUseCase>();
+            services.AddScoped<RefreshTokenUseCase>();
+            services.AddScoped<FindAllUserTypesUseCase>();
+            services.AddScoped<FindUserTypeByIdUseCase>();
+            services.AddScoped<CreateUserTypeUseCase>();
+            services.AddScoped<UpdateUserTypeUseCase>();
+            services.AddScoped<DeactivateUserTypeUseCase>();
 
             return services;
         }
