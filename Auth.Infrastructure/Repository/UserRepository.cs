@@ -26,12 +26,17 @@ namespace Auth.Infrastructure.Repository
 
         public async Task<User?> FindByIdAsync(int id)
         {
-            return await _context.Users.Include((u) => u.UserType).FirstOrDefaultAsync(u => u.Id == id);
+            return await _context.Users
+                .Include(u => u.UserType)
+                .Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
+                .FirstOrDefaultAsync(u => u.Id == id);
         }
 
         public async Task<User?> FindByEmailAsync(string email)
         {
-            return await _context.Users.Include(u => u.UserType)
+            return await _context.Users
+                .Include(u => u.UserType)
                 .Include(u => u.UserRoles)
                 .ThenInclude(ur => ur.Role)
                 .FirstOrDefaultAsync(u => u.Email == email);

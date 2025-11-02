@@ -10,8 +10,12 @@ namespace Auth.Application.Mappings
         public void Register(TypeAdapterConfig config)
         {
             // De un User a un UserDTO
-            config.NewConfig<User, UserDto>().Map(dest => dest.UserType, src => src.UserType.Name)
-                .Map(dest => dest.Roles, src => src.UserRoles.Where(ur => ur.IsActive).Select(ur => ur.Role.Name).ToList()); ;
+            config.NewConfig<User, UserDto>()
+                .Map(dest => dest.UserType, src => src.UserType.Name)
+                .Map(dest => dest.Roles, src => src.UserRoles
+                .Where(ur => ur.IsActive)
+                .Select(ur => ur.Role.Name)
+                .ToList()); ;
 
             config.NewConfig<UserDto, User>();
 

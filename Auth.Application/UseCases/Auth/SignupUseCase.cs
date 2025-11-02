@@ -59,11 +59,13 @@ namespace Auth.Application.UseCases.Auth
 
             await _refreshTokenService.CreateAsync(user.Id, token, refreshToken);
 
+            user = await _userRepository.FindByIdAsync(user.Id);
+
             return new AuthResultDto
             {
                 Token = token,
                 RefreshToken = refreshToken,
-                User = _mapper.Map<UserDto>(user)
+                User = _mapper.Map<UserDto>(user!)
             };
         }
     }
